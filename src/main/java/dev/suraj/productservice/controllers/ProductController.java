@@ -4,6 +4,8 @@ import dev.suraj.productservice.models.Product;
 import dev.suraj.productservice.services.IProductService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 public class ProductController {
     private IProductService productService;
@@ -23,8 +25,8 @@ public class ProductController {
     }
 
     @GetMapping("/products")
-    public void getAllProducts() {
-
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
     }
 
     @GetMapping("/products/{id}")
