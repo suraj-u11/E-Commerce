@@ -60,4 +60,21 @@ public class FakeStoreProductService implements IProductService{
 
         return product;
     }
+
+    @Override
+    public List<Category> getAllCategories() {
+        ResponseEntity<String[]> response = restTemplate.getForEntity("https://fakestoreapi.com/products/categories", String[].class);
+
+        String[] fakeStoreCategories = response.getBody();
+        List<Category> categories = new ArrayList<>();
+
+        for(int i = 0; i < fakeStoreCategories.length; i++) {
+            Category category = new Category();
+            category.setId((long)i);
+            category.setCategoryName(fakeStoreCategories[i]);
+            categories.add(category);
+        }
+
+        return categories;
+    }
 }

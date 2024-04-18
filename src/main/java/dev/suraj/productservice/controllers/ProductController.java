@@ -1,5 +1,6 @@
 package dev.suraj.productservice.controllers;
 
+import dev.suraj.productservice.models.Category;
 import dev.suraj.productservice.models.Product;
 import dev.suraj.productservice.services.IProductService;
 import org.springframework.web.bind.annotation.*;
@@ -36,12 +37,11 @@ public class ProductController {
 
     @DeleteMapping("/products/{id}")
     public void deleteProductById(@PathVariable("id") Long id){
-
     }
 
     @GetMapping("/products/categories")
-    public void getAllCategories() {
-
+    public List<Category> getAllCategories() {
+        return productService.getAllCategories();
     }
 
     @GetMapping("/products/category/{categoryName}")
