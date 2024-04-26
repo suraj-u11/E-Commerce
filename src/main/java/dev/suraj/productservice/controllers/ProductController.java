@@ -4,6 +4,7 @@ import dev.suraj.productservice.dtos.FakeStoreCreateOrUpdateProduct;
 import dev.suraj.productservice.models.Category;
 import dev.suraj.productservice.models.Product;
 import dev.suraj.productservice.services.IProductService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,8 +14,7 @@ import java.util.List;
 @RestController
 public class ProductController {
     private IProductService productService;
-
-    public ProductController(IProductService productService) {
+    public ProductController(@Qualifier("DataBaseProductService") IProductService productService) {
         this.productService = productService;
     }
 
@@ -42,6 +42,9 @@ public class ProductController {
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
 
+        if(products.isEmpty())
+            return new ResponseEntity<>(HttpStatusCode.valueOf(404));
+
         return new ResponseEntity<List<Product>>(products, HttpStatusCode.valueOf(200));
     }
 
@@ -50,7 +53,7 @@ public class ProductController {
         Product product = productService.getProductById(id);
 
         if(product == null)
-            return new ResponseEntity<>(HttpStatusCode.valueOf(204));
+            return new ResponseEntity<>(HttpStatusCode.valueOf(404));
         else
             return new ResponseEntity<>(product, HttpStatusCode.valueOf(200));
     }
@@ -58,13 +61,18 @@ public class ProductController {
     @DeleteMapping("/products/{id}")
     public ResponseEntity<Product> deleteProductById(@PathVariable("id") Long id){
         Product deletedProduct = productService.deleteProductById(id);
-
-        return new ResponseEntity<>(deletedProduct, HttpStatusCode.valueOf(200));
+        if(deletedProduct == null)
+            return new ResponseEntity<>(HttpStatusCode.valueOf(400));
+        else
+            return new ResponseEntity<>(deletedProduct, HttpStatusCode.valueOf(200));
     }
 
     @GetMapping("/products/categories")
     public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = productService.getAllCategories();
+
+        if(categories.isEmpty())
+            return new ResponseEntity<>(HttpStatusCode.valueOf(404));
 
         return new ResponseEntity<>(categories, HttpStatusCode.valueOf(200));
     }
@@ -73,8 +81,8 @@ public class ProductController {
     public ResponseEntity<List<Product>> getProductsByCategory(@PathVariable("categoryName") String categoryName) {
         List<Product> productsByCategory = productService.getProductsByCategory(categoryName);
 
-        if(productsByCategory == null)
-            return new ResponseEntity<>(HttpStatusCode.valueOf(204));
+        if(productsByCategory.isEmpty())
+            return new ResponseEntity<>(HttpStatusCode.valueOf(404));
         else
             return new ResponseEntity<>(productsByCategory,HttpStatusCode.valueOf(200));
     }
