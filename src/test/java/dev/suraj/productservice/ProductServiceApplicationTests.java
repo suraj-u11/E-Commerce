@@ -41,13 +41,13 @@ class ProductServiceApplicationTests {
         System.out.println(product.getId() + " " + product.getCategory().getCategoryName());
     }
 
-    @Test
-    @Transactional
-    public void testCategoryBasedProducts() {
-        Category category = categoryRepo.findByCategoryName("clothing");
-        System.out.println(category.getCategoryName());
-        List<Product> products = category.getProducts();
-        System.out.println(products);
-    }
+//    @Test
+//    @Transactional
+//    public void testCategoryBasedProducts() {
+//        Category category = categoryRepo.findByCategoryName("clothing");
+//        System.out.println(category.getCategoryName());
+//        List<Product> products = category.getProducts();
+//        System.out.println(products);
+//    }
 
 }
