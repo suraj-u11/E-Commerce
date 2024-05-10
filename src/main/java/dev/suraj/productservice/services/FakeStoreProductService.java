@@ -3,6 +3,7 @@ package dev.suraj.productservice.services;
 import dev.suraj.productservice.dtos.FakeStoreProductDto;
 import dev.suraj.productservice.models.Category;
 import dev.suraj.productservice.models.Product;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -12,12 +13,14 @@ import org.springframework.web.client.RestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
+@Service("FakeStoreProductService")
 public class FakeStoreProductService implements IProductService{
     private RestTemplate restTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    public FakeStoreProductService(RestTemplate restTemplate) {
+    public FakeStoreProductService(RestTemplate restTemplate, RedisTemplate<String, Object> redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -52,12 +55,19 @@ public class FakeStoreProductService implements IProductService{
     }
     @Override
     public Product getProductById(Long id) {
+        Product productFromRedisCache= (Product) redisTemplate.opsForValue().get(id.toString());
+        if(productFromRedisCache != null)
+            return productFromRedisCache;
+
         FakeStoreProductDto response = restTemplate.getForObject("https://fakestoreapi.com/products/"+id, FakeStoreProductDto.class);
 
         if(response == null)
             return null;
 
-        return response.toProductObj();
+        Product product = response.toProductObj();
+        redisTemplate.opsForValue().set(id.toString(), product);
+
+        return product;
     }
 
     @Override
